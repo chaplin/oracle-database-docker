@@ -1,0 +1,32 @@
+1. Download and Install sqlplus
+  from http://www.oracle.com/technetwork/topics/intel-macsoft-096467.html
+download 2 files and unzip to same folder
+  1. Instant Client Package - Basic
+  2. Instant Client Package - SQL*Plus
+
+2. Add Env path
+export PATH=[your sqlplus folder]:$PATH
+export NLS_LANG="TRADITIONAL CHINESE_TAIWAN".AL32UTF8
+
+3. Download oracle-xe-11.2.0-1.0.x86_64.rpm.zip
+  #     Download Oracle Database 11g Release 2 Express Edition for Linux x64
+  #     from http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html
+
+3. Build base oracle image
+docker build -t oracle/database:11.2.0.2-xe .
+
+if run into "not enough swap space" Error
+  ref: https://forums.docker.com/t/docker-for-mac-configure-swap-space/20656/5
+  ref: https://github.com/oracle/docker-images/issues/294
+  solution: https://ogobrecht.github.io/posts/2017-03-21-pitfalls-with-oracle-11g-xe-and-docker-on-mac-os
+
+5. Create new container
+docker run --name [container name] \
+  --shm-size=1g \
+  -p 1521:1521 -p 5500:5500 \
+  -e ORACLE_PWD=[your password] \
+  -v [your host folder]:/opt/oracle/oradata \
+  oracle/database:11.2.0.2-xe
+
+6. Init your database with sql files
+sqlplus sys/[your password]@localhost:1521/XE as sysdba @[your sql file path]
